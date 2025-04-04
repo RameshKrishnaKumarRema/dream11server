@@ -5,12 +5,16 @@ import pg from "pg";
 import fs from "fs";
 import { console } from "inspector";
 import env from "dotenv";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 const port = 3000;
 const corsOptions = {
   origin: ["http://localhost:5173/"],
 };
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 env.config();
 
 //Middleware
@@ -27,7 +31,7 @@ const db = new pg.Client({
   port: process.env.PG_PORT,
   ssl: {
     rejectUnauthorized: false,
-    ca: fs.readFileSync("./ssl/ca.pem").toString(),
+    ca: fs.readFileSync(__dirname + "/ssl/ca.pem").toString(),
   },
 });
 
