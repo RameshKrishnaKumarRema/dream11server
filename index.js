@@ -38,7 +38,8 @@ const db = new pg.Client({
 db.connect();
 
 app.get("/", async (req, res) => {
-  var sql = `select contestant.contestantid, contestant.contestantname, sum (entryamount ::numeric::int) as amountspent,sum(contest.winningamount ::numeric::int) as amountwon, sum(contest.winningamount  ::numeric::int) - sum (entryamount ::numeric::int) as Profit,
+  //Get Contestant Tile data
+  var contestantTilesql = `select contestant.contestantid, contestant.contestantname, sum (entryamount ::numeric::int) as amountspent,sum(contest.winningamount ::numeric::int) as amountwon, sum(contest.winningamount  ::numeric::int) - sum (entryamount ::numeric::int) as Profit,
               row_number() OVER (order by sum(contest.winningamount) - sum (entryamount) desc) as Position,
               contestant.contestantphotoname as photoname
               from contest
@@ -47,10 +48,17 @@ app.get("/", async (req, res) => {
               GROUP  BY contestant.contestantid,contestant.contestantname
               order by Profit desc`;
 
-  const result = await db.query(sql);
-  console.log(result.rows);
+  const contestantTileResult = await db.query(contestantTilesql);
+
+  //Get Points Table
+  var pointsTablesql = `select * from  contest_view_IPL2025`;
+  const pointsTableResult = await db.query(pointsTablesql);
+
   res.header("Access-Control-Allow-Origin", "*");
-  res.json(result.rows);
+  res.json({
+    contestantTile: contestantTileResult.rows,
+    pointsTable: pointsTableResult.rows,
+  });
 });
 
 app.listen(port, () => {
