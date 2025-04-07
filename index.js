@@ -54,10 +54,19 @@ app.get("/", async (req, res) => {
   var pointsTablesql = `select ROW_NUMBER() OVER () AS row_num, HomeTeam,awayteam,matchdate,"Ramesh","Abhilash","Dileep","Jayan","Lijin","Mahesh","Tressa","Suraj","Mobin" from  contest_view_IPL2025`;
   const pointsTableResult = await db.query(pointsTablesql);
 
+  //Get Last Five Matches Result
+  var lastFiveMatchessql = `SELECT contestantid,
+                          STRING_AGG(position::text, ',' ORDER BY contestid DESC) AS lastfivepositions
+                          FROM (SELECT contestantid, position, contestid,    
+                          ROW_NUMBER() OVER (PARTITION BY contestantid ORDER BY contestid DESC) AS rn FROM contest ) sub WHERE rn <= 5 GROUP BY contestantid;`;
+
+  const lastFiveMatchesResult = await db.query(lastFiveMatchessql);
+
   res.header("Access-Control-Allow-Origin", "*");
   res.json({
     contestantTile: contestantTileResult.rows,
     pointsTable: pointsTableResult.rows,
+    lastFiveMatches: lastFiveMatchesResult.rows,
   });
 });
 
