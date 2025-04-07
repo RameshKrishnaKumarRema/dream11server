@@ -51,7 +51,7 @@ app.get("/", async (req, res) => {
   const contestantTileResult = await db.query(contestantTilesql);
 
   //Get Points Table
-  var pointsTablesql = `select * from  contest_view_IPL2025`;
+  var pointsTablesql = `select ROW_NUMBER() OVER () AS row_num, HomeTeam,awayteam,matchdate,"Ramesh","Abhilash","Dileep","Jayan","Lijin","Mahesh","Tressa","Suraj","Mobin" from  contest_view_IPL2025`;
   const pointsTableResult = await db.query(pointsTablesql);
 
   res.header("Access-Control-Allow-Origin", "*");
